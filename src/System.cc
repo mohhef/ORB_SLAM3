@@ -578,6 +578,15 @@ void System::SaveTrajectoryTUM(const string &filename)
     vector<KeyFrame*> vpKFs = mpAtlas->GetAllKeyFrames();
     sort(vpKFs.begin(),vpKFs.end(),KeyFrame::lId);
 
+    if (vpKFs.empty()) {
+        cout << "ERROR: No keyframes created - tracking completely failed. Cannot save trajectory." << endl;
+        // Create an empty/marker file so the script knows it failed
+        ofstream f;
+        f.open(filename.c_str());
+        f << "# No keyframes - tracking failed\n";
+        f.close();
+        return;
+    }
     // Transform all keyframes so that the first keyframe is at the origin.
     // After a loop closure the first keyframe might not be at the origin.
     Sophus::SE3f Two = vpKFs[0]->GetPoseInverse();
